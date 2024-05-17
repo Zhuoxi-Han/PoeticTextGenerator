@@ -44,7 +44,26 @@ for i in range(0, len(text) - SEQ_LENGTH, STEP_SIZE):
 x = np.zeros(len(sentences), SEQ_LENGTH, len(characters), dtype=np.bool)
 y = np.zeros(len(sentences), len(characters), dtype=np.bool)
 
+# Assign weight to each character in the text
 for i, sentence in enumerate(sentences):
     for t, character in enumerate(sentence):
         x[i, t, char_to_index[character]] = 1
     y[i, char_to_index[next_characters[i]]] = 1
+
+# Feed x and y arrays into the neural network to predict the next data
+model = Sequential()
+
+# LSTM layer = for Long Short Term Memory; memory of the network; input data during all iterations
+# Define the layer with 128 neurons
+model.add(LSTM(128, input_shape=(SEQ_LENGTH, len(characters))))
+
+# Followed by a dense layer
+model.add(Dense(len(characters)))
+
+# 'softmax' scales the output so all values add up to one (or 100%)
+# So the 'output' is always the probability of a certain character to be the next character
+model.add(Activation('softmax'))
+
+model.compile(loss='categorical_crossentropy', optimize=RMSprop(lr=0.01))
+
+model.fit(x, y, batch_size=256, epochs=4)
