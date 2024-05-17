@@ -11,21 +11,36 @@ text = open(filepath, 'rb').read().decode(encoding='utf-8').lower()
 
 text = text[300000:800000]
 
+# Sort, alphabetically, all characters that appears at least once in the entire text
+# Each character occurs only once
 characters = sorted(set(text))
 
+# Create a dictionary that finds its index by passing a character
+# i.e. {'a': 1, 'b': 2, ...etc}
+# "enumerate" assigns a number to each character
 char_to_index = dict((c, i) for i, c in enumerate(characters))
+
+# Create a dictionary that finds the character by passing an index
 index_to_char = dict((i, c) for i, c in enumerate(characters))
 
-SEQ_LENGTH = 40
+# Number of characters fed into the neural network
+# in order to predict the next character
+SEQ_LENGTH = 40 
+
+# Number of characters shifted as the start of next sequence
 STEP_SIZE = 3
 
-sentences = []
-next_characters = []
+sentences = [] # "how are yo"
+next_characters = [] # "u"
 
 for i in range(0, len(text) - SEQ_LENGTH, STEP_SIZE):
+    # text[a:b] is upper-bound exclusive: starts from a through b-1, with b excluded
     sentences.append(text[i: i+SEQ_LENGTH])
     next_characters.append(text[i+SEQ_LENGTH])
 
+# Convert the training data from string to numerical format
+# Create an array of zeros with 3 dimensions:
+# all possible sentences * individual positions in these sentences * all possible characters
 x = np.zeros(len(sentences), SEQ_LENGTH, len(characters), dtype=np.bool)
 y = np.zeros(len(sentences), len(characters), dtype=np.bool)
 
